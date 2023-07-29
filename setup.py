@@ -25,12 +25,12 @@ ABOUT = load_about()
 
 
 setup(
-    name="tutor-cairn",
+    name="tutor-blend-ed-cairn",
     version=ABOUT["__version__"],
-    url="https://github.com/overhangio/tutor-cairn",
+    url="https://github.com/blend-ed/tutor-cairn",
     project_urls={
-        "Code": "https://github.com/overhangio/tutor-cairn",
-        "Issue tracker": "https://github.com/overhangio/tutor-cairn/issues",
+        "Code": "https://github.com/blend-ed/tutor-cairn",
+        "Issue tracker": "https://github.com/blend-ed/tutor-cairn/issues",
     },
     license="AGPLv3",
     author="Overhang.IO",
