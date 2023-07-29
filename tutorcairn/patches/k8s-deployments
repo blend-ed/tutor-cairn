@@ -20,8 +20,11 @@ rules:
       - ""
     resources:
       - pods
+      - namespaces
+      - nodes
     verbs:
       - watch
+      - list
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -47,10 +50,12 @@ spec:
   selector:
     matchLabels:
       name: cairn-vector
+      app.kubernetes.io/component: Agent
   template:
     metadata:
       labels:
         name: cairn-vector
+        app.kubernetes.io/component: Agent
     spec:
       securityContext:
         runAsUser: 1000
@@ -58,20 +63,27 @@ spec:
         fsGroup: 1000
         fsGroupChangePolicy: "OnRootMismatch"
       serviceAccountName: cairn-vector
-      # Run vector next to LMS
-      affinity:
-        podAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                - key: app.kubernetes.io/name
-                  operator: In
-                  values:
-                    - lms
-              topologyKey: kubernetes.io/hostname
+      # Run vector next to LMS -- Removing affinity temporarily
+      #affinity:
+      #  podAffinity:
+      #    requiredDuringSchedulingIgnoredDuringExecution:
+      #      - labelSelector:
+      #          matchExpressions:
+      #          - key: app.kubernetes.io/name
+      #            operator: In
+      #            values:
+      #              - lms
+      #        topologyKey: kubernetes.io/hostname
       containers:
         - name: cairn-vector
           image: {{ CAIRN_VECTOR_DOCKER_IMAGE }}
+          args:
+            - '--config-dir'
+            - /etc/vector/
+          ports:
+            - name: api
+              containerPort: 8686
+              protocol: TCP
           env:
             - name: VECTOR_SELF_NODE_NAME
               valueFrom:
@@ -93,14 +105,22 @@ spec:
               value: warn
           volumeMounts:
             - name: data
-              mountPath: /var/lib/vector
+              mountPath: /var/lib/vector/
+            - name: config
+              readOnly: true
+              mountPath: /etc/vector/
             - name: var-log
+              readOnly: true
               mountPath: /var/log/
+            - name: var-lib
               readOnly: true
-            - mountPath: /etc/vector/vector.toml
-              name: config
-              subPath: k8s.toml
+              mountPath: /var/lib
+            - name: procfs
               readOnly: true
+              mountPath: /host/proc
+            - name: sysfs
+              readOnly: true
+              mountPath: /host/sys
           securityContext:
             allowPrivilegeEscalation: false
       volumes:
