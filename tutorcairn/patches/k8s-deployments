@@ -110,15 +110,6 @@ spec:
             - name: var-log
               readOnly: true
               mountPath: /var/log/
-            - name: var-lib
-              readOnly: true
-              mountPath: /var/lib
-            - name: procfs
-              readOnly: true
-              mountPath: /host/proc
-            - name: sysfs
-              readOnly: true
-              mountPath: /host/sys
           securityContext:
             allowPrivilegeEscalation: false
       volumes:
