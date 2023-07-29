@@ -50,12 +50,10 @@ spec:
   selector:
     matchLabels:
       name: cairn-vector
-      app.kubernetes.io/component: Agent
   template:
     metadata:
       labels:
         name: cairn-vector
-        app.kubernetes.io/component: Agent
     spec:
       securityContext:
         runAsUser: 1000
